@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Lost in the dark — MoonLeaf Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Hanken+Grotesk:wght@400;500;600&family=Instrument+Serif:ital@1&display=swap" rel="stylesheet">
+<style>
+  :root{--night:#070F0B;--mint:#8FE0B0;--moon:#F4E2B0;--text:#EAF2EC;--dim:rgba(234,242,236,.6)}
+  *{margin:0;box-sizing:border-box}
+  body{min-height:100vh;background:radial-gradient(1000px 600px at 50% -10%,#102219,var(--night));
+    color:var(--text);font-family:"Hanken Grotesk",system-ui,sans-serif;
+    display:grid;place-items:center;text-align:center;padding:30px;overflow:hidden}
+  .moon{position:fixed;top:-120px;right:-80px;width:380px;height:380px;border-radius:50%;
+    background:radial-gradient(circle at 38% 34%,#FCF4DC,var(--moon) 36%,#8a784a 100%);
+    box-shadow:0 0 140px 40px rgba(244,226,176,.2);opacity:.85;pointer-events:none}
+  h1{font-family:"Bricolage Grotesque",sans-serif;font-size:clamp(80px,18vw,180px);letter-spacing:-.04em;line-height:.9}
+  h1 em{font-family:"Instrument Serif",serif;font-style:italic;
+    background:linear-gradient(105deg,#AEF2CC,#FCF4DC);-webkit-background-clip:text;background-clip:text;color:transparent}
+  p{color:var(--dim);font-size:18px;margin:18px 0 30px;max-width:38ch}
+  a{display:inline-flex;align-items:center;gap:8px;background:var(--mint);color:#06150D;font-weight:600;
+    padding:14px 24px;border-radius:999px;text-decoration:none;transition:transform .3s,box-shadow .3s;
+    box-shadow:0 10px 30px -10px rgba(143,224,176,.6)}
+  a:hover{transform:translateY(-2px);box-shadow:0 16px 40px -12px rgba(143,224,176,.8)}
+</style>
+</head>
+<body>
+  <div class="moon" aria-hidden="true"></div>
+  <main>
+    <h1>4<em>0</em>4</h1>
+    <p>This page wandered off after dark. Let's get you back to the light.</p>
+    <a href="/">← Back to MoonLeaf Studio</a>
+  </main>
+</body>
+</html>

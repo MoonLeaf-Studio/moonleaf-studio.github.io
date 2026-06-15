@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MoonLeaf Studio — calm, private iOS apps</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<meta name="description" content="MoonLeaf Studio is a tiny iOS app studio crafting calm, private, delightful apps for iPhone — designed and built end to end.">
+<meta property="og:title" content="MoonLeaf Studio — calm, private iOS apps">
+<meta property="og:description" content="A tiny studio crafting calm, private, delightful apps for iPhone.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --night-900:#070F0B;
+    --night-850:#0A150F;
+    --night-800:#0C1A13;
+    --night-700:#102219;
+    --moss:#16301F;
+    --line:rgba(143,224,176,.13);
+    --line-soft:rgba(143,224,176,.07);
+    --mint:#8FE0B0;
+    --mint-bright:#AEF2CC;
+    --mint-soft:#D2F1DD;
+    --moon:#F4E2B0;
+    --moon-soft:#FCF4DC;
+    --lilac:#C3B6F0;
+    --text:#EAF2EC;
+    --text-dim:rgba(234,242,236,.62);
+    --text-faint:rgba(234,242,236,.40);
+    --maxw:1180px;
+    --ease:cubic-bezier(.22,.61,.36,1);
+    --display:"Bricolage Grotesque", system-ui, sans-serif;
+    --serif:"Instrument Serif", Georgia, serif;
+    --body:"Hanken Grotesk", system-ui, sans-serif;
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--night-900);color:var(--text);font-family:var(--body);
+    font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden;position:relative;
+  }
+  a{color:inherit;text-decoration:none}
+  ::selection{background:var(--mint);color:#06150D}
+  :focus-visible{outline:2px solid var(--mint);outline-offset:3px;border-radius:8px}
+  ::-webkit-scrollbar{width:11px}
+  ::-webkit-scrollbar-track{background:var(--night-900)}
+  ::-webkit-scrollbar-thumb{background:var(--moss);border-radius:99px;border:3px solid var(--night-900)}
+
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 30px}
+  .display{font-family:var(--display);font-weight:700;letter-spacing:-.025em;line-height:1.0}
+  .ser{font-family:var(--serif);font-style:italic;font-weight:400;letter-spacing:0}
+  .grad{
+    background:linear-gradient(105deg,var(--mint-bright) 0%,var(--moon-soft) 55%,var(--lilac) 100%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .eyebrow{
+    font-family:var(--body);font-weight:600;font-size:12.5px;letter-spacing:.22em;text-transform:uppercase;
+    color:var(--mint);display:inline-flex;align-items:center;gap:10px;
+  }
+  .eyebrow::before{content:"";width:22px;height:1px;background:linear-gradient(90deg,transparent,var(--mint))}
+
+  /* ---------- atmosphere ---------- */
+  .grain{position:fixed;inset:0;z-index:9000;pointer-events:none;opacity:.05;mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
+  .vignette{position:fixed;inset:0;z-index:8000;pointer-events:none;
+    background:radial-gradient(120% 90% at 50% 30%,transparent 55%,rgba(0,0,0,.45) 100%);}
+  .aurora{position:absolute;border-radius:50%;filter:blur(80px);opacity:.5;pointer-events:none;z-index:0}
+  .aurora.a1{width:560px;height:560px;background:radial-gradient(circle,rgba(143,224,176,.55),transparent 65%)}
+  .aurora.a2{width:520px;height:520px;background:radial-gradient(circle,rgba(195,182,240,.45),transparent 65%)}
+  @keyframes drift{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(40px,-30px) scale(1.1)}}
+
+  /* ---------- buttons ---------- */
+  .btn{display:inline-flex;align-items:center;gap:9px;font-family:var(--body);font-weight:600;font-size:15px;
+    padding:14px 24px;border-radius:999px;cursor:pointer;border:1px solid transparent;position:relative;overflow:hidden;
+    transition:transform .4s var(--ease), background .3s, box-shadow .3s, border-color .3s, color .3s}
+  .btn-primary{background:linear-gradient(120deg,var(--mint-bright),var(--mint));color:#06150D;
+    box-shadow:0 10px 34px -10px rgba(143,224,176,.6)}
+  .btn-primary:hover{transform:translateY(-3px);box-shadow:0 18px 48px -12px rgba(143,224,176,.8)}
+  .btn-ghost{background:rgba(143,224,176,.04);color:var(--text);border-color:var(--line)}
+  .btn-ghost:hover{transform:translateY(-3px);border-color:var(--mint);color:var(--mint-soft)}
+
+  /* ---------- nav ---------- */
+  header.nav{position:sticky;top:0;z-index:100;backdrop-filter:blur(16px);
+    background:linear-gradient(var(--night-900),rgba(7,15,11,.4));border-bottom:1px solid transparent;transition:border-color .4s}
+  header.nav.scrolled{border-color:var(--line)}
+  .nav-inner{display:flex;align-items:center;justify-content:space-between;height:78px}
+  .brand{display:flex;align-items:center;gap:12px;font-family:var(--display);font-weight:700;font-size:21px;letter-spacing:-.01em}
+  .brand .mark{width:36px;height:36px;flex:none}
+  .nav-links{display:flex;align-items:center;gap:36px}
+  .nav-links a{font-size:15px;color:var(--text-dim);font-weight:500;transition:color .25s;position:relative}
+  .nav-links a::after{content:"";position:absolute;left:0;bottom:-6px;width:0;height:1.5px;background:var(--mint);transition:width .3s var(--ease)}
+  .nav-links a:hover{color:var(--text)}
+  .nav-links a:hover::after{width:100%}
+  .nav-cta{display:flex;align-items:center;gap:14px}
+  .menu-btn{display:none;background:none;border:0;color:var(--text);cursor:pointer}
+
+  /* ---------- hero ---------- */
+  .hero{position:relative;padding:clamp(60px,8vw,96px) 0 clamp(40px,6vw,70px);overflow:hidden;text-align:center}
+  .hero .aurora.a1{top:-160px;left:8%}
+  .hero .aurora.a2{top:40px;right:4%}
+  .moon{position:absolute;top:-40px;left:50%;transform:translateX(-50%);width:min(72vw,460px);height:min(72vw,460px);
+    border-radius:50%;pointer-events:none;z-index:0;will-change:transform;
+    background:radial-gradient(circle at 38% 34%,var(--moon-soft) 0%,var(--moon) 34%,#CDB877 62%,#8a784a 100%);
+    box-shadow:0 0 160px 50px rgba(244,226,176,.22), inset -34px -26px 70px rgba(70,60,34,.45);}
+  .moon::after{content:"";position:absolute;inset:0;border-radius:50%;opacity:.45;
+    background:radial-gradient(circle at 66% 62%,rgba(120,108,70,.55) 0 5%,transparent 6%),
+              radial-gradient(circle at 48% 80%,rgba(120,108,70,.45) 0 3.5%,transparent 4.5%),
+              radial-gradient(circle at 30% 66%,rgba(120,108,70,.4) 0 3%,transparent 4%)}
+  .moon-ring{position:absolute;top:-40px;left:50%;transform:translateX(-50%);width:min(86vw,560px);height:min(86vw,560px);
+    border-radius:50%;border:1px solid rgba(244,226,176,.14);z-index:0;pointer-events:none}
+  .stars{position:absolute;inset:0;z-index:0;pointer-events:none}
+  .hero-copy{position:relative;z-index:3;max-width:920px;margin:0 auto}
+  .hero h1{font-size:clamp(48px,9vw,108px);margin:24px 0 0;letter-spacing:-.03em}
+  .hero h1 .ser{font-size:1.04em;letter-spacing:-.01em}
+  .hero p.lead{font-size:clamp(17px,1.7vw,21px);color:var(--text-dim);max-width:44ch;margin:26px auto 36px}
+  .hero-actions{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+  .hero-note{margin-top:30px;display:inline-flex;align-items:center;gap:10px;font-size:13px;color:var(--text-faint)}
+
+  /* phone shelf */
+  .shelf{position:relative;z-index:3;margin-top:clamp(40px,6vw,72px);display:flex;justify-content:center;align-items:flex-end;gap:0;perspective:1600px}
+  .shelf::after{content:"";position:absolute;bottom:-30px;left:50%;transform:translateX(-50%);width:70%;height:120px;
+    background:radial-gradient(ellipse at center,rgba(143,224,176,.16),transparent 70%);filter:blur(14px);z-index:-1}
+  .phone{--pw:230px;width:var(--pw);aspect-ratio:230/480;border-radius:38px;padding:10px;
+    background:linear-gradient(150deg,#040C08,#1b2c22);position:relative;flex:none;
+    box-shadow:0 50px 90px -34px rgba(0,0,0,.85), 0 0 0 1px rgba(143,224,176,.08), inset 0 0 0 1px rgba(0,0,0,.6);
+    transition:transform .6s var(--ease)}
+  .phone .island{position:absolute;top:16px;left:50%;transform:translateX(-50%);width:66px;height:19px;background:#000;border-radius:999px;z-index:4}
+  .phone .screen{width:100%;height:100%;border-radius:29px;overflow:hidden;position:relative}
+  .phone.center{--pw:262px;z-index:3}
+  .phone.left{z-index:2;transform:rotate(-9deg) translate(34px,16px)}
+  .phone.right{z-index:2;transform:rotate(9deg) translate(-34px,16px)}
+  .shelf:hover .phone.center{transform:translateY(-8px)}
+  .shelf:hover .phone.left{transform:rotate(-11deg) translate(20px,12px)}
+  .shelf:hover .phone.right{transform:rotate(11deg) translate(-20px,12px)}
+  .floaty{animation:float 7s var(--ease) infinite}
+  @keyframes float{0%,100%{margin-bottom:0}50%{margin-bottom:14px}}
+
+  /* phone screens */
+  .scr{width:100%;height:100%;position:relative;display:flex;flex-direction:column;color:#fff}
+  .scr-pad{padding:40px 18px 18px}
+  .s-eviva{background:linear-gradient(175deg,#D98A86,#7A3A57)}
+  .s-eviva .badge{font-size:9px;letter-spacing:.18em;color:rgba(255,245,247,.85);font-weight:700}
+  .s-eviva .evivaicon{width:72px;height:72px;border-radius:22px;background:linear-gradient(160deg,#FFE0CE,#F4A6B0);
+    display:grid;place-items:center;font-size:34px;margin:24px auto 14px;box-shadow:0 16px 30px -8px rgba(232,139,150,.55)}
+  .s-eviva h4{font-family:var(--display);font-size:20px;line-height:1.1;text-align:center;color:#FFF6F2}
+  .s-eviva .week{display:flex;gap:8px;justify-content:center;margin-top:12px}
+  .s-eviva .week b{font-family:var(--display);font-weight:700;font-size:22px;color:#FFF6F2}
+  .s-eviva .week span{font-size:10px;color:rgba(255,245,247,.8);align-self:center;text-align:left;line-height:1.3}
+  .s-eviva .sub{font-size:11px;color:rgba(255,245,247,.8);text-align:center;margin-top:8px;line-height:1.45}
+  .s-eviva .cta{margin-top:auto;background:#FFE3D6;color:#6e2740;text-align:center;font-weight:700;font-size:12px;padding:11px;border-radius:13px}
+
+  .s-cubby{background:linear-gradient(165deg,#2C6E8F,#143447)}
+  .s-cubby .chip{font-size:9px;color:#0e2230;background:#BFE3F2;padding:4px 10px;border-radius:99px;font-weight:700;align-self:flex-start}
+  .s-cubby .map{flex:1;border-radius:14px;margin:10px 0;position:relative;overflow:hidden;
+     background:
+       linear-gradient(180deg,rgba(0,0,0,.04),rgba(0,0,0,.28)),
+       repeating-linear-gradient(0deg,rgba(255,255,255,.06) 0 1px,transparent 1px 20px),
+       repeating-linear-gradient(90deg,rgba(255,255,255,.06) 0 1px,transparent 1px 20px),
+       linear-gradient(135deg,#3486a6,#1c5570)}
+  .s-cubby .pin{position:absolute;width:11px;height:11px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:#FFD27F;box-shadow:0 2px 4px rgba(0,0,0,.45)}
+  .s-cubby .pin.p1{top:24%;left:30%}
+  .s-cubby .pin.p2{top:50%;left:64%}
+  .s-cubby .pin.me{top:62%;left:42%;width:13px;height:13px;border-radius:50%;transform:none;background:#8FE0B0;box-shadow:0 0 0 4px rgba(143,224,176,.3)}
+  .s-cubby .result{background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.18);border-radius:12px;padding:10px}
+  .s-cubby .r-top{display:flex;justify-content:space-between;align-items:center}
+  .s-cubby .r-top b{font-family:var(--display);font-size:13px;color:#fff}
+  .s-cubby .star{font-size:10px;color:#FFD27F;font-weight:700}
+  .s-cubby .r-sub{font-size:10px;color:rgba(255,255,255,.78);margin-top:4px}
+  .bar{height:8px;border-radius:99px;background:rgba(255,255,255,.14);margin-top:8px}
+  .bar.s{width:55%}.bar.m{width:78%}
+
+  .s-tempo{background:linear-gradient(165deg,#2E2358,#15112e)}
+  .s-tempo .ring{width:96px;height:96px;border-radius:50%;margin:18px auto 14px;
+    background:conic-gradient(var(--lilac) 0 72%,rgba(195,182,240,.18) 72% 100%);
+    display:grid;place-items:center}
+  .s-tempo .ring i{width:70px;height:70px;border-radius:50%;background:#15112e;display:grid;place-items:center;
+    font-family:var(--display);font-weight:700;font-size:19px;color:#fff;font-style:normal}
+  .s-tempo h4{font-family:var(--display);font-size:14px;text-align:center;color:#EAF2EC}
+  .s-tempo .habit{display:flex;align-items:center;gap:9px;margin-top:12px;font-size:11px;color:rgba(234,242,236,.8)}
+  .s-tempo .habit .ck{width:18px;height:18px;border-radius:6px;background:rgba(195,182,240,.25);display:grid;place-items:center;color:var(--lilac);font-size:11px}
+  .s-tempo .habit.done .ck{background:var(--lilac);color:#15112e}
+
+  /* marquee */
+  .marquee{border-top:1px solid var(--line-soft);border-bottom:1px solid var(--line-soft);overflow:hidden;
+    padding:18px 0;margin-top:clamp(48px,7vw,84px);position:relative;z-index:3;
+    -webkit-mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);
+    mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent)}
+  .marquee-track{display:flex;gap:42px;white-space:nowrap;width:max-content;animation:scrollx 28s linear infinite}
+  .marquee span{font-family:var(--display);font-size:18px;color:var(--text-faint);display:inline-flex;align-items:center;gap:42px}
+  .marquee span::after{content:"✦";color:var(--mint);opacity:.7}
+  @keyframes scrollx{to{transform:translateX(-50%)}}
+
+  /* ---------- section shell ---------- */
+  section{position:relative;padding:clamp(74px,9vw,124px) 0}
+  .sec-head{max-width:660px;margin-bottom:58px}
+  .sec-head.center{margin-inline:auto;text-align:center}
+  .sec-head h2{font-size:clamp(32px,4.8vw,56px);margin:18px 0 0}
+  .sec-head p{color:var(--text-dim);margin-top:18px;font-size:18px}
+
+  .reveal{opacity:0;transform:translateY(30px);transition:opacity .9s var(--ease), transform .9s var(--ease)}
+  .reveal.in{opacity:1;transform:none}
+
+  /* ---------- apps ---------- */
+  #apps{background:radial-gradient(1100px 540px at 82% -8%,rgba(143,224,176,.06),transparent 60%),var(--night-850)}
+  .apps{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+  .app-card{position:relative;background:linear-gradient(180deg,var(--night-700),var(--night-800));
+    border:1px solid var(--line);border-radius:30px;padding:28px 26px 30px;display:flex;flex-direction:column;
+    overflow:hidden;transition:transform .5s var(--ease),border-color .4s,box-shadow .5s var(--ease)}
+  .app-card::before{content:"";position:absolute;inset:0 0 auto 0;height:3px;
+    background:linear-gradient(90deg,var(--mint),var(--moon),var(--lilac));opacity:0;transition:opacity .4s}
+  .app-card:hover{transform:translateY(-9px);border-color:rgba(143,224,176,.4);box-shadow:0 36px 70px -30px rgba(0,0,0,.75)}
+  .app-card:hover::before{opacity:1}
+  .app-top{display:flex;align-items:center;gap:14px;margin-bottom:18px}
+  .app-icon{width:56px;height:56px;border-radius:16px;display:grid;place-items:center;font-size:28px;flex:none;
+    box-shadow:0 12px 24px -8px rgba(0,0,0,.6),inset 0 0 0 1px rgba(255,255,255,.08)}
+  .app-name{font-family:var(--display);font-weight:700;font-size:22px}
+  .app-cat{font-size:12.5px;color:var(--mint);font-weight:600;letter-spacing:.04em}
+  .app-card p{color:var(--text-dim);font-size:15px;flex:1}
+  .app-screen{height:150px;border-radius:18px;margin:4px 0 18px;overflow:hidden;position:relative;border:1px solid rgba(255,255,255,.05)}
+  .app-foot{display:flex;align-items:center;justify-content:space-between;margin-top:auto}
+  .store{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:var(--text);
+    border:1px solid var(--line);padding:9px 14px;border-radius:999px;transition:border-color .3s,color .3s,background .3s}
+  .store:hover{border-color:var(--mint);color:#06150D;background:var(--mint)}
+  .ver{font-size:12px;color:var(--text-faint)}
+  .mini{position:absolute;inset:0;padding:14px;display:flex;flex-direction:column;gap:8px}
+  .mini .big{position:absolute;inset:0;display:grid;place-items:center;font-size:42px}
+  .mini-ring{width:50px;height:50px;border-radius:50%;background:conic-gradient(var(--lilac) 0 70%,rgba(195,182,240,.2) 70%);margin:auto}
+
+  .more-apps{display:flex;flex-wrap:wrap;gap:12px;margin-top:32px}
+  .pill{display:inline-flex;align-items:center;gap:9px;border:1px solid var(--line);border-radius:999px;
+    padding:10px 17px;font-size:14px;color:var(--text-dim);transition:border-color .3s,transform .3s}
+  .pill:hover{border-color:var(--mint);transform:translateY(-2px)}
+  .pill b{color:var(--text);font-weight:600}
+
+  /* ---------- values ---------- */
+  .values{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+  .value{padding:34px 28px;border-radius:26px;border:1px solid var(--line);
+    background:linear-gradient(180deg,rgba(143,224,176,.05),rgba(143,224,176,.01));transition:transform .45s var(--ease),border-color .4s}
+  .value:hover{transform:translateY(-6px);border-color:rgba(143,224,176,.3)}
+  .value .vicon{width:50px;height:50px;border-radius:14px;background:rgba(143,224,176,.12);display:grid;place-items:center;margin-bottom:20px}
+  .value h3{font-family:var(--display);font-size:21px;margin-bottom:10px}
+  .value p{color:var(--text-dim);font-size:15px}
+
+  /* ---------- process ---------- */
+  #process{background:var(--night-850)}
+  .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:0;position:relative}
+  .steps::before{content:"";position:absolute;top:0;left:0;right:0;height:1px;
+    background:linear-gradient(90deg,var(--mint),var(--moon),var(--lilac),transparent)}
+  .step{padding:30px 24px 0;position:relative}
+  .step:not(:last-child){border-right:1px solid var(--line-soft)}
+  .step .num{font-family:var(--display);font-weight:800;font-size:14px;color:var(--mint);letter-spacing:.08em}
+  .step h3{font-family:var(--display);font-size:22px;margin:16px 0 10px}
+  .step p{color:var(--text-dim);font-size:14.5px}
+
+  /* ---------- cta / footer ---------- */
+  .cta-band{position:relative;text-align:center;overflow:hidden}
+  .cta-band .aurora.a1{bottom:-220px;left:18%}
+  .cta-band .aurora.a2{top:-200px;right:14%}
+  .cta-band .moon-sm{position:absolute;left:50%;top:-160px;transform:translateX(-50%);width:340px;height:340px;border-radius:50%;
+    background:radial-gradient(circle at 40% 35%,var(--moon-soft),var(--moon) 44%,#9c8a55 100%);filter:blur(1px);opacity:.45;pointer-events:none}
+  .cta-inner{position:relative;z-index:3;max-width:720px;margin:0 auto}
+  .cta-inner h2{font-size:clamp(36px,6vw,72px)}
+  .cta-inner p{color:var(--text-dim);margin:20px auto 36px;max-width:46ch;font-size:18px}
+  .cta-actions{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+
+  footer{border-top:1px solid var(--line);padding:54px 0 58px;background:var(--night-900);position:relative;z-index:3}
+  .foot-grid{display:flex;justify-content:space-between;align-items:flex-start;gap:34px;flex-wrap:wrap}
+  .foot-brand{max-width:320px}
+  .foot-brand p{color:var(--text-faint);font-size:14px;margin-top:15px;line-height:1.6}
+  .foot-cols{display:flex;gap:64px;flex-wrap:wrap}
+  .foot-col h4{font-size:12.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-faint);margin-bottom:15px;font-weight:600}
+  .foot-col a{display:block;color:var(--text-dim);font-size:14.5px;margin-bottom:11px;transition:color .25s}
+  .foot-col a:hover{color:var(--mint-soft)}
+  .foot-bottom{margin-top:44px;padding-top:26px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;color:var(--text-faint);font-size:13.5px}
+
+  @media(max-width:920px){
+    .nav-links{display:none}
+    .menu-btn{display:block}
+    .apps{grid-template-columns:1fr 1fr}
+    .values{grid-template-columns:1fr}
+    .steps{grid-template-columns:1fr 1fr}
+    .steps::before{display:none}
+    .step{border:1px solid var(--line-soft);border-radius:18px;margin-bottom:12px;padding:24px}
+    .step:not(:last-child){border-right:1px solid var(--line-soft)}
+  }
+  @media(max-width:680px){
+    .phone.left,.phone.right{display:none}
+    .phone.center{--pw:240px}
+  }
+  @media(max-width:560px){
+    body{font-size:16px}.wrap{padding:0 22px}
+    .apps{grid-template-columns:1fr}
+    .steps{grid-template-columns:1fr}
+    .foot-cols{gap:38px}
+  }
+  @media (prefers-reduced-motion: reduce){
+    .floaty,.aurora,.marquee-track{animation:none}
+    .reveal{transition:none;opacity:1;transform:none}
+    html{scroll-behavior:auto}
+  }
+</style>
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+<div class="vignette" aria-hidden="true"></div>
+
+<svg width="0" height="0" aria-hidden="true"><defs>
+  <linearGradient id="g1" x1="0" y1="0" x2="40" y2="40">
+    <stop offset="0" stop-color="#F4E2B0"/><stop offset="1" stop-color="#8FE0B0"/>
+  </linearGradient></defs></svg>
+
+<!-- NAV -->
+<header class="nav" id="nav">
+  <div class="wrap nav-inner">
+    <a class="brand" href="#top" aria-label="MoonLeaf Studio home">
+      <svg class="mark" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+        <path d="M28 6a15 15 0 1 0 6 12 11 11 0 0 1-6-12Z" fill="url(#g1)"/>
+        <path d="M20 21c0-5 4-9 9-9-1 6-5 9-9 9Zm0 0c0 4-3 7-7 7 .5-4 3-7 7-7Z" fill="#070F0B" opacity=".5"/>
+      </svg>
+      MoonLeaf <span style="color:var(--mint);margin-left:-2px">Studio</span>
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="#apps">Apps</a><a href="#studio">Studio</a><a href="#process">Process</a><a href="#contact">Contact</a>
+    </nav>
+    <div class="nav-cta">
+      <a class="btn btn-primary" href="#contact">Start a project</a>
+      <button class="menu-btn" id="menuBtn" aria-label="Menu" onclick="document.querySelector('.nav-links').classList.toggle('open')">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<a id="top"></a>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="aurora a1"></div>
+  <div class="aurora a2"></div>
+  <div class="moon-ring" aria-hidden="true"></div>
+  <div class="moon" id="moon" aria-hidden="true"></div>
+  <svg class="stars" aria-hidden="true" preserveAspectRatio="none"></svg>
+
+  <div class="wrap hero-copy">
+    <span class="eyebrow">MoonLeaf Studio · iOS apps</span>
+    <h1 class="display">Apps grown<br>with <span class="ser grad">care.</span></h1>
+    <p class="lead">A tiny studio crafting calm, private, delightful apps for iPhone — designed and built end to end.</p>
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="#apps">Explore our apps →</a>
+      <a class="btn btn-ghost" href="#process">How we work</a>
+    </div>
+    <div class="hero-note">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--mint)" stroke-width="2"><path d="M12 3l2.5 6 6.5.5-5 4.2 1.6 6.3L12 17l-5.6 3 1.6-6.3-5-4.2 6.5-.5z"/></svg>
+      Native SwiftUI · on-device by default · a focused little studio
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="shelf">
+      <!-- Cubby (left) -->
+      <div class="phone left"><div class="island"></div><div class="screen">
+        <div class="scr s-cubby scr-pad">
+          <span class="chip">Near you · 12 spots</span>
+          <div class="map">
+            <span class="pin p1"></span><span class="pin p2"></span><span class="pin me"></span>
+          </div>
+          <div class="result">
+            <div class="r-top"><b>Sunnybrook Daycare</b><span class="star">★ 4.9</span></div>
+            <div class="r-sub">0.4 mi · 3 spots open · ages 0–4</div>
+          </div>
+        </div>
+      </div></div>
+
+      <!-- Eviva (center) -->
+      <div class="phone center floaty"><div class="island"></div><div class="screen">
+        <div class="scr s-eviva scr-pad">
+          <div class="badge">✦ EVIVA</div>
+          <div class="evivaicon">🌸</div>
+          <h4>This week with<br>your little one</h4>
+          <div class="week"><b>24</b><span>weeks · baby is<br>the size of a cantaloupe</span></div>
+          <div class="sub">Gentle, private guidance from the first test to the toddler years.</div>
+          <div class="cta">Open today</div>
+        </div>
+      </div></div>
+
+      <!-- Tempo (right) -->
+      <div class="phone right"><div class="island"></div><div class="screen">
+        <div class="scr s-tempo scr-pad">
+          <div class="ring"><i>72%</i></div>
+          <h4>Today's rhythm</h4>
+          <div class="habit done"><span class="ck">✓</span> Morning walk</div>
+          <div class="habit done"><span class="ck">✓</span> Read 10 min</div>
+          <div class="habit"><span class="ck"></span> Water plants</div>
+        </div>
+      </div></div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="marquee" aria-hidden="true">
+      <div class="marquee-track">
+        <span>Pregnancy &amp; parenthood</span><span>Local childcare</span><span>Calm habits</span><span>Sleep &amp; focus</span><span>On-device AI</span><span>SwiftUI craft</span>
+        <span>Pregnancy &amp; parenthood</span><span>Local childcare</span><span>Calm habits</span><span>Sleep &amp; focus</span><span>On-device AI</span><span>SwiftUI craft</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- APPS -->
+<section id="apps">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">From the studio</span>
+      <h2 class="display">Little apps, <span class="ser">sweated over.</span></h2>
+      <p>Each one starts as a single feeling we want to give someone. We keep them small, fast, and quietly private.</p>
+    </div>
+
+    <div class="apps">
+      <article class="app-card reveal">
+        <div class="app-top">
+          <div class="app-icon" style="background:linear-gradient(160deg,#FFE0CE,#F4A6B0)">🌸</div>
+          <div><div class="app-name">Eviva</div><div class="app-cat">Pregnancy · Parenthood</div></div>
+        </div>
+        <div class="app-screen s-eviva"><div class="mini"><div class="big">🌸</div></div></div>
+        <p>A calm companion from the first test to the toddler years — week-by-week guidance, kick counts, appointments, and milestones. Private by default, and never preachy.</p>
+        <div class="app-foot"><a class="store" href="#contact"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M16.4 13.2c0-2.3 1.9-3.4 2-3.5-1.1-1.6-2.8-1.8-3.4-1.8-1.4-.1-2.8.9-3.5.9s-1.8-.8-3-.8c-1.5 0-2.9.9-3.7 2.3-1.6 2.7-.4 6.7 1.1 8.9.7 1.1 1.6 2.3 2.8 2.2 1.1 0 1.5-.7 2.9-.7s1.7.7 2.9.7 2-1.1 2.7-2.1c.8-1.2 1.2-2.4 1.2-2.4s-2.2-.9-2.3-3.4zM14.3 6.3c.6-.8 1-1.8.9-2.9-.9 0-2 .6-2.6 1.4-.6.7-1.1 1.7-.9 2.7 1 .1 2-.5 2.6-1.2z"/></svg>App Store</a><span class="ver">v1.0</span></div>
+      </article>
+
+      <article class="app-card reveal">
+        <div class="app-top">
+          <div class="app-icon" style="background:linear-gradient(160deg,#BFE3F2,#3486A6)">🧸</div>
+          <div><div class="app-name">Cubby</div><div class="app-cat">Family · Childcare</div></div>
+        </div>
+        <div class="app-screen s-cubby"><div class="mini"><span class="chip" style="position:relative;z-index:2">Near you</span><div class="map" style="flex:1"><span class="pin p1"></span><span class="pin p2"></span><span class="pin me"></span></div></div></div>
+        <p>Find trusted childcare near you — daycares, in-home spots, sitters, and nannies — on a map. Filter by age, hours, availability, and price, with verified reviews from local parents.</p>
+        <div class="app-foot"><a class="store" href="#contact"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M16.4 13.2c0-2.3 1.9-3.4 2-3.5-1.1-1.6-2.8-1.8-3.4-1.8-1.4-.1-2.8.9-3.5.9s-1.8-.8-3-.8c-1.5 0-2.9.9-3.7 2.3-1.6 2.7-.4 6.7 1.1 8.9.7 1.1 1.6 2.3 2.8 2.2 1.1 0 1.5-.7 2.9-.7s1.7.7 2.9.7 2-1.1 2.7-2.1c.8-1.2 1.2-2.4 1.2-2.4s-2.2-.9-2.3-3.4zM14.3 6.3c.6-.8 1-1.8.9-2.9-.9 0-2 .6-2.6 1.4-.6.7-1.1 1.7-.9 2.7 1 .1 2-.5 2.6-1.2z"/></svg>App Store</a><span class="ver">Beta</span></div>
+      </article>
+
+      <article class="app-card reveal">
+        <div class="app-top">
+          <div class="app-icon" style="background:linear-gradient(160deg,#C3B6F0,#6c5fb0)">🌗</div>
+          <div><div class="app-name">Tempo</div><div class="app-cat">Health · Habits</div></div>
+        </div>
+        <div class="app-screen s-tempo"><div class="mini" style="justify-content:center"><div class="mini-ring"></div><div class="bar m" style="background:rgba(195,182,240,.4);margin:0 auto"></div></div></div>
+        <p>Gentle habits without the streak guilt. Tempo nudges softly, celebrates quietly, and never makes you feel behind. Just a calmer rhythm.</p>
+        <div class="app-foot"><a class="store" href="#contact"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M16.4 13.2c0-2.3 1.9-3.4 2-3.5-1.1-1.6-2.8-1.8-3.4-1.8-1.4-.1-2.8.9-3.5.9s-1.8-.8-3-.8c-1.5 0-2.9.9-3.7 2.3-1.6 2.7-.4 6.7 1.1 8.9.7 1.1 1.6 2.3 2.8 2.2 1.1 0 1.5-.7 2.9-.7s1.7.7 2.9.7 2-1.1 2.7-2.1c.8-1.2 1.2-2.4 1.2-2.4s-2.2-.9-2.3-3.4zM14.3 6.3c.6-.8 1-1.8.9-2.9-.9 0-2 .6-2.6 1.4-.6.7-1.1 1.7-.9 2.7 1 .1 2-.5 2.6-1.2z"/></svg>App Store</a><span class="ver">Coming soon</span></div>
+      </article>
+    </div>
+
+    <div class="more-apps reveal">
+      <span class="pill">🌌 <b>Lumen</b> — wind-down &amp; sleep sounds</span>
+      <span class="pill">🍃 <b>Sprout</b> — a plant-care companion</span>
+      <span class="pill">✦ <b>Glimmer</b> — a one-line-a-day diary</span>
+    </div>
+  </div>
+</section>
+
+<!-- STUDIO -->
+<section id="studio">
+  <div class="aurora a1" style="left:-160px;top:20%;opacity:.25"></div>
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">The studio</span>
+      <h2 class="display">We build like the platform is a place we <span class="ser">live.</span></h2>
+      <p>No frameworks bolted on, no trackers tucked in. Three things guide everything that leaves the lab.</p>
+    </div>
+    <div class="values">
+      <div class="value reveal">
+        <div class="vicon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--mint)" stroke-width="2"><path d="M12 3l7 3v5c0 5-3.5 8-7 9-3.5-1-7-4-7-9V6l7-3z"/></svg></div>
+        <h3>Private by design</h3>
+        <p>On-device first. We use Apple's frameworks and on-device intelligence so your data has no reason to leave your phone.</p>
+      </div>
+      <div class="value reveal">
+        <div class="vicon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--mint)" stroke-width="2"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg></div>
+        <h3>Native &amp; fast</h3>
+        <p>Built in SwiftUI for iPhone specifically — not a web app in a costume. Fluid, light on battery, instant to open.</p>
+      </div>
+      <div class="value reveal">
+        <div class="vicon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--mint)" stroke-width="2"><path d="M12 17.5 5.8 21l1.2-6.9L2 9.2l7-1L12 2l3 6.2 7 1-5 4.9 1.2 6.9z"/></svg></div>
+        <h3>Made to delight</h3>
+        <p>Haptics, motion, sound, and the tiny details that earn a smile. Accessibility and Reduce Motion are baked in, not bolted on.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section id="process">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">How we work</span>
+      <h2 class="display">From a feeling to the <span class="ser">App Store.</span></h2>
+      <p>A short, honest path. You see real builds early and often — usually within the first week.</p>
+    </div>
+    <div class="steps">
+      <div class="step reveal"><div class="num">01</div><h3>Spark</h3><p>We name the single feeling the app should give, and the one person it's for.</p></div>
+      <div class="step reveal"><div class="num">02</div><h3>Shape</h3><p>Prototypes in days, designed in the open. We cut everything that doesn't serve the feeling.</p></div>
+      <div class="step reveal"><div class="num">03</div><h3>Build</h3><p>Native Swift, on-device, accessible by default. Tested on real devices, not just the simulator.</p></div>
+      <div class="step reveal"><div class="num">04</div><h3>Launch</h3><p>We sweat the screenshots, the metadata, and the day-one polish — then keep tending it.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact" class="cta-band">
+  <div class="aurora a1"></div><div class="aurora a2"></div>
+  <div class="moon-sm" aria-hidden="true"></div>
+  <div class="wrap cta-inner reveal">
+    <span class="eyebrow" style="justify-content:center">Let's talk</span>
+    <h2 class="display" style="margin-top:18px">Have an idea worth <span class="ser grad">growing?</span></h2>
+    <p>Tell us the feeling you're chasing. We'll tell you honestly whether we're the right studio to build it — and what it would take.</p>
+    <div class="cta-actions">
+      <a class="btn btn-primary" href="mailto:hello@moonleaf.studio">hello@moonleaf.studio</a>
+      <a class="btn btn-ghost" href="#apps">See what we've made</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a class="brand" href="#top" aria-label="MoonLeaf Studio">
+          <svg class="mark" viewBox="0 0 40 40" fill="none" aria-hidden="true"><path d="M28 6a15 15 0 1 0 6 12 11 11 0 0 1-6-12Z" fill="url(#g1)"/></svg>
+          MoonLeaf <span style="color:var(--mint)">Studio</span>
+        </a>
+        <p>A small iOS studio making calm, private apps for iPhone. This is all we do.</p>
+      </div>
+      <div class="foot-cols">
+        <div class="foot-col"><h4>Apps</h4><a href="#apps">Eviva</a><a href="#apps">Cubby</a><a href="#apps">Tempo</a><a href="#apps">Lumen</a></div>
+        <div class="foot-col"><h4>Studio</h4><a href="#studio">About</a><a href="#process">Process</a><a href="#contact">Work with us</a></div>
+        <div class="foot-col"><h4>Elsewhere</h4><a href="#">App Store</a><a href="#">Mastodon</a><a href="https://github.com/MoonLeaf-Studio" target="_blank" rel="noopener">GitHub</a></div>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 MoonLeaf Studio. Crafted for iPhone.</span>
+      <span>Privacy · Terms</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const nav = document.getElementById('nav');
+  const onScroll = () => nav.classList.toggle('scrolled', window.scrollY > 8);
+  onScroll(); window.addEventListener('scroll', onScroll, {passive:true});
+
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // reveals
+  const io = new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});},{threshold:.15});
+  document.querySelectorAll('.reveal').forEach((el,i)=>{el.style.transitionDelay=(i%4*70)+'ms';io.observe(el);});
+
+  // hero stars
+  (function(){
+    const svg = document.querySelector('.stars'); if(!svg) return;
+    let html='';
+    for(let i=0;i<54;i++){
+      const x=Math.random()*100,y=Math.random()*100,r=Math.random()*1.3+0.4,o=(Math.random()*0.5+0.15).toFixed(2);
+      html+=`<circle cx="${x}%" cy="${y}%" r="${r}" fill="#EAF2EC" opacity="${o}">`;
+      if(!reduce){const d=(Math.random()*3+2).toFixed(1),b=(Math.random()*3).toFixed(1);
+        html+=`<animate attributeName="opacity" values="${o};${Math.min(1,o*2.4).toFixed(2)};${o}" dur="${d}s" begin="${b}s" repeatCount="indefinite"/>`;}
+      html+=`</circle>`;
+    }
+    svg.innerHTML=html;
+  })();
+
+  // parallax moon + drifting aurora on pointer
+  if(!reduce){
+    const moon=document.getElementById('moon');
+    const auroras=document.querySelectorAll('.hero .aurora');
+    window.addEventListener('pointermove',(e)=>{
+      const dx=(e.clientX/window.innerWidth-.5), dy=(e.clientY/window.innerHeight-.5);
+      if(moon) moon.style.transform=`translateX(-50%) translate(${dx*22}px,${dy*16}px)`;
+      auroras.forEach((a,i)=>{const f=(i+1)*18; a.style.transform=`translate(${dx*f}px,${dy*f}px)`;});
+    },{passive:true});
+    // gentle ambient drift
+    auroras.forEach((a,i)=>{a.style.animation=`drift ${16+i*4}s ease-in-out ${i*2}s infinite`;});
+  }
+
+  document.querySelectorAll('.nav-links a').forEach(a=>a.addEventListener('click',()=>document.querySelector('.nav-links').classList.remove('open')));
+</script>
+
+<style>
+  @media(max-width:920px){
+    .nav-links.open{display:flex;position:absolute;top:78px;left:0;right:0;flex-direction:column;gap:0;
+      background:var(--night-800);border-bottom:1px solid var(--line);padding:8px 30px 18px}
+    .nav-links.open a{padding:14px 0;border-bottom:1px solid var(--line-soft)}
+  }
+</style>
+</body>
+</html>
